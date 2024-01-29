@@ -1,13 +1,15 @@
-export function markupGallery({
-  webformatURL,
-  largeImageURL,
-  tags,
-  likes,
-  views,
-  comments,
-  downloads,
-}) {
-  return `<li class="gallery-item">
+const markupGallery = arr => {
+  return arr
+    .map(
+      ({
+        webformatURL,
+        largeImageURL,
+        tags,
+        likes,
+        views,
+        comments,
+        downloads,
+      }) => `<li class="gallery-item">
           <a
             class="gallery-link"
             href="${largeImageURL}"
@@ -32,5 +34,9 @@ export function markupGallery({
               Downloads<span class="comments-text">${downloads}</span>
             </p>
           </div>
-        </li>`;
-}
+        </li>`
+    )
+    .join('');
+};
+
+export { markupGallery };

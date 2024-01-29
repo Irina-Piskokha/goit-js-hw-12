@@ -6,57 +6,76 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import { refs } from './js/refs';
 import { markupGallery } from './js/markupGallery';
 import { serchPictureGallery } from './services/api';
+import { buttonLoadMore } from './services/buttonLoadMore';
+
+const pageSizeParams = {
+  page: 1,
+  maxPage: 0,
+  pageSize: 40,
+};
 
 refs.loader.style.display = 'none';
 
-refs.form.addEventListener('submit', onButtonClick);
+refs.form.addEventListener('submit', onFormSubmit);
 
-async function onButtonClick(event) {}
+async function onFormSubmit(event) {
+  event.preventDefault();
 
-// function onButtonClick(evt) {
-//   evt.preventDefault();
+  refs.ulContainer.innerHTML = '';
+  refs.loader.style.display = 'block';
+  const form = event.currentTarget;
+  const input = form.elements.text.value.trim();
 
-//   refs.ulContainer.innerHTML = '';
-//   refs.loader.style.display = 'block';
+  try {
+    const { hits } = await serchPictureGallery(input);
+    console.log(hits);
+    refs.loader.style.display = 'none';
 
-//   const form = evt.currentTarget;
-//   const input = form.elements.text.value;
+    if (hits.length === 0) {
+      iziToast.error({
+        message:
+          'Sorry, there are no images matching your search query. Please try again!',
+        position: 'topRight',
+        backgroundColor: '#EF4040',
+        color: '#FAFAFB',
+      });
+    }
 
-//   serchPictureGallery(input)
-//     .then(data => {
-//       refs.loader.style.display = 'none';
-//       const pictures = data.hits;
-//       let markup = '';
+    if (!input) {
+      iziToast.error({
+        message: 'Sorry, you have not entered anything!',
+        position: 'topRight',
+        backgroundColor: '#EF4040',
+        color: '#FAFAFB',
+      });
+      return;
+    }
 
-//       for (const elem of pictures) {
-//         markup += markupGallery(elem);
-//       }
+    refs.ulContainer.innerHTML = markupGallery(hits);
 
-//       if (data.hits.length === 0) {
-//         iziToast.error({
-//           message:
-//             'Sorry, there are no images matching your search query. Please try again!',
-//           position: 'topRight',
-//           backgroundColor: '#EF4040',
-//           color: '#FAFAFB',
-//         });
-//       }
+    const lightbox = new SimpleLightbox('.list_gallery a', {
+      caption: true,
+      captionsData: 'alt',
+      captionPosition: 'bottom',
+      captionDelay: 250,
+    });
+    lightbox.refresh();
 
-//       refs.ulContainer.innerHTML = markup;
+    if (hits.length > 0 && hits.length !== totalResults) {
+      buttonLoadMore.show(refs.buttonLoadMore);
+      refs.buttonLoadMore.addEventListener('click', onButtonLoadMoreClick);
+    } else {
+      buttonLoadMore.hide(refs.buttonLoadMore);
+    }
+  } catch (error) {
+    console.log(error);
+    refs.loader.style.display = 'none';
+  } finally {
+    form.reset();
+  }
+}
 
-//       const lightbox = new SimpleLightbox('.list_gallery a', {
-//         caption: true,
-//         captionsData: 'alt',
-//         captionPosition: 'bottom',
-//         captionDelay: 250,
-//       });
-//       lightbox.refresh();
-//     })
-//     .catch(error => {
-//       console.log(error);
-//       refs.loader.style.display = 'none';
-//     })
-//     .finally(() => {
-//       form.reset();
-//     });
-// }
+async function onButtonLoadMoreClick() {
+  pageSizeParams.page += 1;
+  buttonLoadMore.disable(buttonLoadMore);
+}

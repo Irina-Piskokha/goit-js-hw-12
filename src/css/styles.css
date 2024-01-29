@@ -68,6 +68,10 @@ button {
   outline: auto;
 }
 
+.is-hidden {
+  display: none;
+}
+
 button:hover {
   background: #6c8cff;
 }
