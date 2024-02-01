@@ -68,8 +68,19 @@ button {
   outline: auto;
 }
 
+.button-more {
+  margin: 40px auto;
+  display: block;
+}
+
 .is-hidden {
   display: none;
+}
+
+button:disabled {
+  background-color: #cfcfcf;
+  color: #989898;
+  outline: none;
 }
 
 button:hover {

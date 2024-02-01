@@ -2,5 +2,6 @@ export const refs = {
   form: document.querySelector('.form'),
   ulContainer: document.querySelector('.list_gallery'),
   loader: document.querySelector('.loader'),
-  buttonLoadMore: document.querySelector('.button'),
+  buttonSearch: document.querySelector('.button'),
+  buttonLoadMore: document.querySelector('.button-more'),
 };
