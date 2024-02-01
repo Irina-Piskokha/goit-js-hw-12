@@ -89,10 +89,10 @@ async function onButtonLoadMoreClick() {
     const markup = markupGallery(hits);
     refs.ulContainer.insertAdjacentHTML('beforeend', markup); // розмітка
 
-    const rect = refs.ulContainer.getBoundingClientRect();
+    const rect = refs.ulContainer.firstElementChild.getBoundingClientRect();
     console.log(rect);
     window.scrollBy({
-      top: 800,
+      top: 350,
       left: 50,
       behavior: 'smooth',
     });
