@@ -1,12 +1,11 @@
 import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
-import SimpleLightbox from 'simplelightbox';
-import 'simplelightbox/dist/simple-lightbox.min.css';
 
 import { refs } from './js/refs';
 import { markupGallery } from './js/markupGallery';
 import { serchPictureGallery } from './services/api';
 import { buttonLoadMore } from './services/buttonLoadMore';
+import { lightbox } from './js/lightbox';
 
 const pageSizeParams = {
   query: '',
@@ -42,8 +41,8 @@ async function onFormSubmit(event) {
   }
 
   try {
-    const { hits, totalHits } = await serchPictureGallery(pageSizeParams);
-    pageSizeParams.maxPage = Math.ceil(totalHits / pageSizeParams.per_page);
+    const { hits, total } = await serchPictureGallery(pageSizeParams);
+    pageSizeParams.maxPage = Math.ceil(total / 40);
     refs.loader.style.display = 'none';
 
     if (hits.length === 0) {
@@ -58,16 +57,9 @@ async function onFormSubmit(event) {
     }
 
     refs.ulContainer.innerHTML = markupGallery(hits); // розмітка
-
-    const lightbox = new SimpleLightbox('.list_gallery a', {
-      caption: true,
-      captionsData: 'alt',
-      captionPosition: 'bottom',
-      captionDelay: 250,
-    });
     lightbox.refresh();
 
-    if (hits.length > 0 && hits.length !== totalHits) {
+    if (hits.length > 0 && hits.length !== total) {
       buttonLoadMore.show(refs.buttonLoadMore);
       refs.buttonLoadMore.addEventListener('click', onButtonLoadMoreClick);
     } else {
@@ -88,21 +80,20 @@ async function onButtonLoadMoreClick() {
 
     const markup = markupGallery(hits);
     refs.ulContainer.insertAdjacentHTML('beforeend', markup); // розмітка
+    lightbox.refresh();
 
-    const rect = refs.ulContainer.firstElementChild.getBoundingClientRect();
+    const rect = document
+      .querySelector('.gallery-item')
+      .getBoundingClientRect();
     console.log(rect);
-    window.scrollBy({
-      top: 350,
-      left: 50,
-      behavior: 'smooth',
-    });
+    window.scrollBy({ top: rect.height * 1.3, left: 0, behavior: 'smooth' });
   } catch (error) {
     console.log(error);
   } finally {
     buttonLoadMore.enable(buttonLoadMore);
 
     if (pageSizeParams.page === pageSizeParams.maxPage) {
-      buttonLoadMore.hide(buttonLoadMore);
+      refs.buttonLoadMore.style.display = 'none';
       iziToast.error({
         message:
           'We are sorry, but you have reached the end of search results.',
