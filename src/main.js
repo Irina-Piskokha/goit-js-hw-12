@@ -85,7 +85,6 @@ async function onButtonLoadMoreClick() {
     const rect = document
       .querySelector('.gallery-item')
       .getBoundingClientRect();
-    console.log(rect);
     window.scrollBy({ top: rect.height * 1.3, left: 0, behavior: 'smooth' });
   } catch (error) {
     console.log(error);
